@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login e Cadastro</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 20px;
+        }
+
+        .container {
+            width: 900px;
+            max-width: 100%;
+            min-height: 550px;
+            display: flex;
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Área de apresentação */
+        .welcome {
+            width: 45%;
+            padding: 50px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        }
+
+        .welcome h1 {
+            font-size: 38px;
+            margin-bottom: 20px;
+        }
+
+        .welcome p {
+            font-size: 16px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        /* Área dos formulários */
+        .forms {
+            width: 55%;
+            padding: 50px;
+        }
+
+        .form {
+            display: none;
+            animation: aparecer 0.4s ease;
+        }
+
+        .form.active {
+            display: block;
+        }
+
+        @keyframes aparecer {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form h2 {
+            font-size: 30px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .form .subtitle {
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 18px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 7px;
+            color: #444;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+        }
+
+        .forgot {
+            display: block;
+            text-align: right;
+            margin: -5px 0 20px;
+            color: #6366f1;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .forgot:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #6366f1, #7c3aed);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .change-form {
+            text-align: center;
+            margin-top: 25px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .change-form button {
+            border: none;
+            background: none;
+            color: #6366f1;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .change-form button:hover {
+            text-decoration: underline;
+        }
+
+        .message {
+            display: none;
+            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .message.success {
+            display: block;
+            color: #166534;
+            background: #dcfce7;
+            border: 1px solid #86efac;
+        }
+
+        .message.error {
+            display: block;
+            color: #991b1b;
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+        }
+
+        /* Responsividade */
+        @media (max-width: 700px) {
+            .container {
+                flex-direction: column;
+                min-height: auto;
+            }
+
+            .welcome {
+                width: 100%;
+                padding: 35px;
+                text-align: center;
+            }
+
+            .welcome h1 {
+                font-size: 30px;
+            }
+
+            .forms {
+                width: 100%;
+                padding: 35px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Área de apresentação -->
+        <div class="welcome">
+            <h1>Olá!</h1>
+
+            <p>
+                Seja bem-vindo ao nosso site.
+                Entre na sua conta ou crie um novo cadastro
+                para começar.
+            </p>
+        </div>
+
+        <!-- Formulários -->
+        <div class="forms">
+
+            <!-- Mensagem -->
+            <div id="message" class="message"></div>
+
+            <!-- LOGIN -->
+            <form class="form active" id="loginForm">
+
+                <h2>Entrar</h2>
+
+                <p class="subtitle">
+                    Acesse sua conta
+                </p>
+
+                <div class="input-group">
+                    <label for="loginEmail">
+                        E-mail
+                    </label>
+
+                    <input
+                        type="email"
+                        id="loginEmail"
+                        placeholder="Digite seu e-mail"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label for="loginPassword">
+                        Senha
+                    </label>
+
+                    <input
+                        type="password"
+                        id="loginPassword"
+                        placeholder="Digite sua senha"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <a href="#" class="forgot" id="forgotPassword">
+                    Esqueci minha senha
+                </a>
+
+                <button type="submit" class="btn" id="loginButton">
+                    Entrar
+                </button>
+
+                <p class="change-form">
+                    Ainda não possui uma conta?
+
+                    <button type="button" onclick="mostrarCadastro()">
+                        Criar conta
+                    </button>
+                </p>
+
+            </form>
+
+
+            <!-- CADASTRO -->
+            <form class="form" id="registerForm">
+
+                <h2>Criar conta</h2>
+
+                <p class="subtitle">
+                    Cadastre-se gratuitamente
+                </p>
+
+                <div class="input-group">
+                    <label for="name">
+                        Nome
+                    </label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        placeholder="Digite seu nome"
+                        autocomplete="name"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label for="registerEmail">
+                        E-mail
+                    </label>
+
+                    <input
+                        type="email"
+                        id="registerEmail"
+                        placeholder="Digite seu e-mail"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label for="registerPassword">
+                        Senha
+                    </label>
+
+                    <input
+                        type="password"
+                        id="registerPassword"
+                        placeholder="Crie uma senha"
+                        autocomplete="new-password"
+                        minlength="6"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label for="confirmPassword">
+                        Confirmar senha
+                    </label>
+
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        placeholder="Digite a senha novamente"
+                        autocomplete="new-password"
+                        minlength="6"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn" id="registerButton">
+                    Criar conta
+                </button>
+
+                <p class="change-form">
+                    Já possui uma conta?
+
+                    <button type="button" onclick="mostrarLogin()">
+                        Entrar
+                    </button>
+                </p>
+
+            </form>
+
+        </div>
+    </div>
+
+
+    <!--
+        Supabase JS via CDN.
+        Não é necessário usar import/export neste HTML.
+    -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+    <script>
+
+        /*
+        =====================================================
+        CONFIGURAÇÃO DO SUPABASE
+        =====================================================
+        */
+
+        const supabaseUrl =
+            'https://emdmtsbwwannfvzmtkby.supabase.co';
+
+        const supabaseKey =
+            'COLOQUE_AQUI_SUA_PUBLISHABLE_KEY';
+
+
+        /*
+        Cria o cliente Supabase.
+        */
+
+        const { createClient } = supabase;
+
+        const supabaseClient = createClient(
+            supabaseUrl,
+            supabaseKey
+        );
+
+
+        /*
+        =====================================================
+        ELEMENTOS DA PÁGINA
+        =====================================================
+        */
+
+        const loginForm =
+            document.getElementById('loginForm');
+
+        const registerForm =
+            document.getElementById('registerForm');
+
+        const message =
+            document.getElementById('message');
+
+        const loginButton =
+            document.getElementById('loginButton');
+
+        const registerButton =
+            document.getElementById('registerButton');
+
+
+        /*
+        =====================================================
+        FUNÇÕES DE INTERFACE
+        =====================================================
+        */
+
+        function mostrarCadastro() {
+
+            limparMensagem();
+
+            loginForm.classList.remove('active');
+
+            registerForm.classList.add('active');
+        }
+
+
+        function mostrarLogin() {
+
+            limparMensagem();
+
+            registerForm.classList.remove('active');
+
+            loginForm.classList.add('active');
+        }
+
+
+        function mostrarMensagem(texto, tipo) {
+
+            message.textContent = texto;
+
+            message.className = 'message ' + tipo;
+        }
+
+
+        function limparMensagem() {
+
+            message.textContent = '';
+
+            message.className = 'message';
+        }
+
+
+        /*
+        =====================================================
+        LOGIN
+        =====================================================
+        */
+
+        loginForm.addEventListener('submit', async function (event) {
+
+            event.preventDefault();
+
+            limparMensagem();
+
+            const email =
+                document.getElementById('loginEmail').value.trim();
+
+            const senha =
+                document.getElementById('loginPassword').value;
+
+
+            loginButton.disabled = true;
+
+            loginButton.textContent = 'Entrando...';
+
+
+            try {
+
+                const { data, error } =
+                    await supabaseClient.auth.signInWithPassword({
+
+                        email: email,
+
+                        password: senha
+
+                    });
+
+
+                if (error) {
+
+                    throw error;
+
+                }
+
+
+                mostrarMensagem(
+                    'Login realizado com sucesso!',
+                    'success'
+                );
+
+
+                console.log(
+                    'Usuário autenticado:',
+                    data.user
+                );
+
+
+                /*
+                Aqui você pode redirecionar para
+                uma página protegida.
+
+                Exemplo:
+
+                window.location.href = 'dashboard.html';
+                */
+
+            } catch (error) {
+
+                console.error(error);
+
+                mostrarMensagem(
+                    'Não foi possível entrar. Verifique seu e-mail e senha.',
+                    'error'
+                );
+
+            } finally {
+
+                loginButton.disabled = false;
+
+                loginButton.textContent = 'Entrar';
+
+            }
+
+        });
+
+
+        /*
+        =====================================================
+        CADASTRO
+        =====================================================
+        */
+
+        registerForm.addEventListener('submit', async function (event) {
+
+            event.preventDefault();
+
+            limparMensagem();
+
+
+            const nome =
+                document.getElementById('name').value.trim();
+
+            const email =
+                document.getElementById('registerEmail').value.trim();
+
+            const senha =
+                document.getElementById('registerPassword').value;
+
+            const confirmarSenha =
+                document.getElementById('confirmPassword').value;
+
+
+            /*
+            Verifica se as senhas são iguais.
+            */
+
+            if (senha !== confirmarSenha) {
+
+                mostrarMensagem(
+                    'As senhas não são iguais.',
+                    'error'
+                );
+
+                return;
+            }
+
+
+            /*
+            Validação simples da senha.
+            */
+
+            if (senha.length < 6) {
+
+                mostrarMensagem(
+                    'A senha deve possuir pelo menos 6 caracteres.',
+                    'error'
+                );
+
+                return;
+            }
+
+
+            registerButton.disabled = true;
+
+            registerButton.textContent = 'Criando conta...';
+
+
+            try {
+
+                const { data, error } =
+                    await supabaseClient.auth.signUp({
+
+                        email: email,
+
+                        password: senha,
+
+                        options: {
+
+                            data: {
+
+                                nome: nome
+
+                            }
+
+                        }
+
+                    });
+
+
+                if (error) {
+
+                    throw error;
+
+                }
+
+
+                console.log(
+                    'Usuário cadastrado:',
+                    data.user
+                );
+
+
+                /*
+                Dependendo das configurações do Supabase,
+                o usuário poderá precisar confirmar o
+                e-mail antes de fazer login.
+                */
+
+                if (data.session) {
+
+                    mostrarMensagem(
+                        'Conta criada com sucesso! Você já está conectado.',
+                        'success'
+                    );
+
+                } else {
+
+                    mostrarMensagem(
+                        'Conta criada! Verifique seu e-mail para confirmar o cadastro.',
+                        'success'
+                    );
+
+                }
+
+
+                registerForm.reset();
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                mostrarMensagem(
+                    'Não foi possível criar a conta: ' + error.message,
+                    'error'
+                );
+
+            } finally {
+
+                registerButton.disabled = false;
+
+                registerButton.textContent = 'Criar conta';
+
+            }
+
+        });
+
+
+        /*
+        =====================================================
+        RECUPERAÇÃO DE SENHA
+        =====================================================
+        */
+
+        document
+            .getElementById('forgotPassword')
+            .addEventListener('click', async function (event) {
+
+                event.preventDefault();
+
+                const email =
+                    document.getElementById('loginEmail').value.trim();
+
+
+                if (!email) {
+
+                    mostrarMensagem(
+                        'Digite seu e-mail antes de solicitar a recuperação da senha.',
+                        'error'
+                    );
+
+                    return;
+                }
+
+
+                try {
+
+                    const { error } =
+                        await supabaseClient.auth.resetPasswordForEmail(
+                            email,
+                            {
+                                redirectTo:
+                                    window.location.origin
+                            }
+                        );
+
+
+                    if (error) {
+
+                        throw error;
+
+                    }
+
+
+                    mostrarMensagem(
+                        'Se o e-mail estiver cadastrado, você receberá as instruções para redefinir sua senha.',
+                        'success'
+                    );
+
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    mostrarMensagem(
+                        'Não foi possível solicitar a recuperação da senha.',
+                        'error'
+                    );
+
+                }
+
+            });
+
+
+        /*
+        =====================================================
+        VERIFICAÇÃO DA SESSÃO
+        =====================================================
+        */
+
+        async function verificarSessao() {
+
+            const {
+                data,
+                error
+            } = await supabaseClient.auth.getSession();
+
+
+            if (error) {
+
+                console.error(
+                    'Erro ao verificar sessão:',
+                    error
+                );
+
+                return;
+            }
+
+
+            if (data.session) {
+
+                console.log(
+                    'Usuário já está autenticado:',
+                    data.session.user
+                );
+
+            }
+
+        }
+
+
+        verificarSessao();
+
+
+        /*
+        =====================================================
+        MONITORAMENTO DA AUTENTICAÇÃO
+        =====================================================
+        */
+
+        supabaseClient.auth.onAuthStateChange(
+            function (event, session) {
+
+                console.log(
+                    'Evento de autenticação:',
+                    event
+                );
+
+                if (session) {
+
+                    console.log(
+                        'Usuário:',
+                        session.user
+                    );
+
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>
